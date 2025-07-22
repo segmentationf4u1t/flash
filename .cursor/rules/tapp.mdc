@@ -1,0 +1,44 @@
+---
+description: Next.js Development, State Management, Testing, Coding style
+alwaysApply: false
+---
+Rule Name: tapp
+Description: 
+
+### TypeScript Best Practices for LLM-Assisted Development (Grok)
+- **Strong Typing Everywhere**: Always use explicit types (e.g., interfaces, types) for props, state, and functions. Avoid `any` to prevent errors; prefer `unknown` for uncertain data and narrow types via guards. This helps Grok provide accurate code suggestions by understanding data shapes clearly.
+- **Generics for Reusability**: Use generics in hooks, components, and utilities (e.g., `function useFetch<T>(url: string): T | null`). This makes code flexible and allows Grok to infer and suggest type-safe implementations.
+- **Enums and Union Types**: Prefer enums for fixed values (e.g., `enum Status { Idle, Loading, Error }`) and unions for variants (e.g., `type Result = Success | Error`). Document with JSDoc for Grok to reference during queries.
+- **Error Handling**: Use `try-catch` with typed errors (e.g., extend `Error` class). For async functions, return `Promise<Result<T, Error>>` to make error states predictable for LLM analysis.
+- **Type Guards and Assertions**: Implement custom type guards (e.g., `function isUser(obj: unknown): obj is User { ... }`) to refine types. Use assertions sparingly (e.g., `as const`) to aid Grok in static analysis.
+- **LLM Interaction Tips**: When querying Grok, provide type definitions in prompts for context. Structure code with clear separation of concerns (e.g., types in a `types.ts` file) to enable better AI-assisted refactoring.
+
+### Jotai Best Practices in Next.js
+- **Atomic State Management**: Use atoms for granular, independent state slices (e.g., `export const userAtom = atom<User | null>(null)`). Avoid large monolithic stores; split into focused atoms for better performance and scalability.
+- **Providers and Hooks**: Wrap the app in `<Provider>` from `jotai` in `layout.tsx` for global access. Use `useAtom` for reading/writing and `useAtomValue` for read-only to minimize re-renders.
+- **Derived Atoms and Selectors**: Create computed atoms for derived state (e.g., `const filteredUsersAtom = atom((get) => get(usersAtom).filter(...))`). This optimizes performance by recomputing only when dependencies change.
+- **Async and Persistence**: For async data, use `loadable` or combine with `useAtomCallback`. Integrate persistence with `atomWithStorage` from `jotai/utils` for localStorage/sessionStorage.
+- **Next.js Integration**: Use in Client Components (`'use client'`); fetch initial data in Server Components and hydrate atoms on client. Avoid overusing for server-fetched data—leverage Next.js caching first.
+- **Performance**: Use `useAtom` sparingly in components; memoize with `React.memo` if re-renders are frequent.
+
+### Shadcn/UI Best Practices
+- **Component Customization**: Since all Shadcn components are preinstalled, customize them directly in `components/ui/` (e.g., extend with Tailwind classes for theming while keeping base styles intact for consistency).
+- **Accessibility Focus**: Always add ARIA attributes (e.g., `aria-label`) and ensure keyboard navigation. Use Shadcn's built-in accessible components like Button, Dialog, and test with tools like Lighthouse.
+- **Composition**: Build complex UIs by composing Shadcn primitives (e.g., combine Card, Input, and Button for forms). Avoid heavy nesting to maintain performance.
+- **Theming and Responsiveness**: Use Tailwind's responsive utilities (e.g., `sm:`, `md:`) in custom classes. Define themes in `globals.css` or `tailwind.config.ts` for dark mode support.
+- **Next.js Tips**: Use in both Server and Client Components; for interactive ones (e.g., DropdownMenu), mark with `'use client'`. Lazy-load non-critical components with `dynamic` imports.
+
+### Performant Coding Overall
+- **Rendering Optimization**: Use `React.memo`, `useMemo`, and `useCallback` to prevent unnecessary re-renders.
+- **Bundle Size**: Code-split with `dynamic` imports (e.g., `const LazyComponent = dynamic(() => import('./Component'))`). Minimize dependencies; use tree-shaking compatible libraries.
+- **Data Fetching**: Prefer server-side fetching in Server Components with `fetch` and caching (`{ cache: 'force-cache' }` or `{ next: { revalidate: 3600 } }`). On client, use React Query or SWR for mutations and optimistic updates.
+- **Image and Asset Handling**: Use Next.js `<Image>` for optimization. Compress assets and serve WebP/AVIF formats.
+- **Profiling and Monitoring**: Use `React.Profiler` for render times Aim for <100ms TTI (Time to Interactive).
+
+### General Web Development Best Practices
+- **SEO and Accessibility**: Use semantic HTML, meta tags via `<Head>`, and alt text. Ensure WCAG compliance (e.g., color contrast >4.5:1). Leverage Next.js for automatic optimizations like prefetching.
+- **Security**: Sanitize inputs, use HTTPS, and avoid storing sensitive data in client state. Implement CSRF protection for forms.
+- **Responsive Design**: Use Tailwind's mobile-first approach;
+- **Testing**: Write unit tests with Vitest for components and atoms. Add integration tests for pages with Playwright
+- **Code Style**: Keep functions small (<50 lines), use meaningful variable names, and comment complex logic for Grok-assisted maintenance.
+- **Project Structure**: Organize as: `app/` for routes, `components/` for UI, `lib/` for utilities, `stores/` for Jotai atoms. Use barrel exports (index.ts) for cleaner imports.
